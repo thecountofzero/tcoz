@@ -13,7 +13,6 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
             this.appContainer = this.element.find('#appContainer');
 
             if(this.options.useAppSpace) {
-                console.log('useAppSpace');
                 this.element.append('<div id="appSpace"></div>');
                 this.appSpace = this.element.find('#appSpace');
                 this.appSpace.css('display', 'none');
