@@ -2,6 +2,7 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
 
     can.Control("TCOZ.AppSwitcher", {
         defaults: {
+            routeAttr: 'app',
             useAppSpace: true,
             apps: {}
         }
@@ -18,12 +19,12 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
                 this.appSpace.css('display', 'none');
             }
 
-            can.route(':app');
-            can.route(':app/:appId');
-            can.route('', {app: 'dashboard'});
+            this.loadApp(can.route.attr());
         },
 
-        "{can.route} app": function(data) {
+        "{can.route} {routeAttr}": "loadApp",
+
+        loadApp: function(data) {
             var existingApp,
                 appName = data.app,
                 appToLoad = this.options.apps[appName],
