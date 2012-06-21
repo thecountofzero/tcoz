@@ -1,6 +1,8 @@
 steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function($) {
 
-    can.Control("TCOZ.AppSwitcher", {
+    window.TCOZ = window.TCOZ || {};
+
+    window.TCOZ.AppSwitcher = can.Control({
         defaults: {
             routeAttr: 'app',
             useAppSpace: true,
@@ -22,12 +24,19 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
             this.loadApp(can.route.attr());
         },
 
+        _getAppToLoad: function(appName) {
+            return ($.isFunction(appName)) ? {
+                app: appName,
+                opts: {}
+            } : appName;
+        },
+
         "{can.route} {routeAttr}": "loadApp",
 
         loadApp: function(data) {
             var existingApp,
                 appName = data.app,
-                appToLoad = this.options.apps[appName],
+                appToLoad = this._getAppToLoad(this.options.apps[appName]),
                 appContainer = this.appContainer;
 
             if(appToLoad && this.currentAppName !== appName) {
@@ -46,7 +55,7 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
                 }
                 else {
                     appContainer.append('<div class="app ' + appName + '"></div>');
-                    new appToLoad(appContainer.find('.app'));
+                    new appToLoad.app(appContainer.find('.app'), $.extend(true, this.options.appOpts, appToLoad.opts));
                 }
 
                 this.currentAppName = appName;
@@ -59,5 +68,4 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
             }
         }
     });
-    
 });
