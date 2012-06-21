@@ -1,7 +1,8 @@
 steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function($) {
 
-    can.Control("TCOZ.Breadcrumb", {
-    }, {
+    window.TCOZ = window.TCOZ || {};
+
+    window.TCOZ.Breadcrumb = can.Control({
         init : function() {
             var self = this;
             this.setContent(can.route.attr());
