@@ -1,0 +1,13 @@
+.accordion-close .collapser,
+.accordion-open .collapser {
+    float: right;
+    padding: 15px;
+}
+.accordion-close .collapser {
+    background: url('/donejs/cloudarray/resources/images/collapse.png') no-repeat 15px 15px;
+}
+.accordion-open .collapser {
+    background: url('/donejs/cloudarray/resources/images/expand.png') no-repeat 12px 17px;
+}
+
+.collapsible { cursor: pointer }
