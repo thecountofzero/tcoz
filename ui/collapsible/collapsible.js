@@ -46,7 +46,9 @@ steal('can/control', './collapsible.css', function($) {
 
         destroy: function() {
             this.element.removeClass('opened closed collapsible');
-            this.element.find('.collapser').remove();
+
+            // FIXME: Commented out for now until Issue #58 is resolved
+            //this.element.find('.collapser').remove();
             can.Control.prototype.destroy.call(this);
         }
     });
