@@ -6,7 +6,8 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
         defaults: {
             routeAttr: 'app',
             useAppSpace: true,
-            apps: {}
+            apps: {},
+            appOpts: {}
         }
     }, {
         init: function() {
@@ -24,11 +25,12 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
             this.loadApp(can.route.attr());
         },
 
-        _getAppToLoad: function(appName) {
-            return ($.isFunction(appName)) ? {
-                app: appName,
-                opts: {}
-            } : appName;
+        _getAppToLoad: function(app) {
+            return ($.isFunction(app)) ? {
+                app: app,
+                opts: {},
+                useAppSpace: this.options.useAppSpace
+            } : app;
         },
 
         "{can.route} {routeAttr}": "loadApp",
@@ -41,7 +43,7 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
 
             if(appToLoad && this.currentAppName !== appName) {
 
-                if(this.options.useAppSpace && this.currentAppName) {
+                if(this.options.useAppSpace && this.currentAppName && this.currentApp.useAppSpace !== false) {
                     // Move current app to app space before loading new app
                     var el = appContainer.find('.app').trigger('paused').appendTo(this.appSpace);
                 }
@@ -51,13 +53,14 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
 
                 if(this.options.useAppSpace && (existingApp = this.appSpace.find('.'+appName)) && existingApp.length) {
                     
-                    existingApp.appendTo(appContainer);
+                    existingApp.trigger('resumed').appendTo(appContainer);
                 }
                 else {
                     appContainer.append('<div class="app ' + appName + '"></div>');
                     new appToLoad.app(appContainer.find('.app'), $.extend(true, this.options.appOpts, appToLoad.opts));
                 }
 
+                this.currentApp = appToLoad;
                 this.currentAppName = appName;
             }
             else {
