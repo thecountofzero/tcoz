@@ -22,6 +22,8 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
                 this.appSpace.css('display', 'none');
             }
 
+            this.appCache = {};
+
             this.loadApp(can.route.attr());
         },
 
@@ -37,6 +39,7 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
 
         loadApp: function(data) {
             var existingApp,
+                $app,
                 appName = data.app,
                 appToLoad = this._getAppToLoad(this.options.apps[appName]),
                 appContainer = this.appContainer;
@@ -45,7 +48,8 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
 
                 if(this.options.useAppSpace && this.currentAppName && this.currentApp.useAppSpace !== false) {
                     // Move current app to app space before loading new app
-                    var el = appContainer.find('.app').trigger('paused').appendTo(this.appSpace);
+                    //var el = appContainer.find('.app').trigger('paused').appendTo(this.appSpace);
+                    var el = this.appCache[this.currentAppName].trigger('paused').appendTo(this.appSpace);
                 }
                 else {
                     appContainer.empty();
@@ -57,7 +61,9 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
                 }
                 else {
                     appContainer.append('<div class="app ' + appName + '"></div>');
-                    new appToLoad.app(appContainer.find('.app'), $.extend(true, this.options.appOpts, appToLoad.opts));
+                    $app = appContainer.find('.app');
+                    new appToLoad.app($app, $.extend(true, this.options.appOpts, appToLoad.opts));
+                    this.appCache[appName] = $app;
                 }
 
                 this.currentApp = appToLoad;
