@@ -35,34 +35,43 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
             } : app;
         },
 
+        _unloadAppByName: function(appNameToUnload) {
+
+            appNameToUnload = appNameToUnload || this.currentAppName;
+
+            if(this.options.useAppSpace && this.currentAppName && this.currentApp.useAppSpace !== false) {
+
+                // Move current app to app space before loading new app
+                //var el = appContainer.find('.app').trigger('paused').appendTo(this.appSpace);
+                this.appCache[appNameToUnload].trigger('paused').appendTo(this.appSpace);
+            }
+            else {
+                this.appContainer.empty();
+            }
+        },
+
         "{can.route} {routeAttr}": "loadApp",
 
         loadApp: function(data) {
-            var existingApp,
+            var opts = this.options,
+                existingApp,
                 $app,
                 appName = data.app,
-                appToLoad = this._getAppToLoad(this.options.apps[appName]),
+                appToLoad = this._getAppToLoad(opts.apps[appName]),
                 appContainer = this.appContainer;
 
             if(appToLoad && this.currentAppName !== appName) {
 
-                if(this.options.useAppSpace && this.currentAppName && this.currentApp.useAppSpace !== false) {
-                    // Move current app to app space before loading new app
-                    //var el = appContainer.find('.app').trigger('paused').appendTo(this.appSpace);
-                    var el = this.appCache[this.currentAppName].trigger('paused').appendTo(this.appSpace);
-                }
-                else {
-                    appContainer.empty();
-                }
+                this._unloadAppByName();
 
-                if(this.options.useAppSpace && (existingApp = this.appSpace.find('.'+appName)) && existingApp.length) {
+                if(opts.useAppSpace && (existingApp = this.appSpace.find('.'+appName)) && existingApp.length) {
                     
                     existingApp.trigger('resumed').appendTo(appContainer);
                 }
                 else {
                     appContainer.append('<div class="app ' + appName + '"></div>');
                     $app = appContainer.find('.app');
-                    new appToLoad.app($app, $.extend(true, this.options.appOpts, appToLoad.opts));
+                    new appToLoad.app($app, $.extend(true, opts.appOpts, appToLoad.opts));
                     this.appCache[appName] = $app;
                 }
 
@@ -72,6 +81,11 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
             else {
                  if(!appToLoad) {
                     console.log('No such app');
+
+                    this._unloadAppByName();
+
+                    this.currentApp = null;
+                    this.currentAppName = '';
                  }
                  else console.log('App already loaded');
             }
