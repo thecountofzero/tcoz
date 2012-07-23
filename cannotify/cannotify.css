@@ -1,0 +1,51 @@
+/* ===== Notification messages ===== */
+
+.nNote { 
+	cursor: pointer; 
+	clear: both; 
+	margin: 20px 0 20px 0;
+	font-family: Arial, Helvetica, sans-serif;
+	line-height: 20px;
+}
+.nNote strong { 
+	margin-right: 5px;
+	text-transform: uppercase;
+}
+.nNote p { 
+	font-size: 11px; 
+	padding: 10px 25px 10px 54px; 
+	margin: 0; 
+	color: #565656; 
+}
+.nMessage p { font-size: 11px; }
+.nWarning { 
+	background: #ffe9ad url(images/error.png) no-repeat 15px center; 
+	border: 1px solid #eac572; 
+	color: #826200; 
+}
+.nSuccess { 
+	background: #effeb9 url(images/accept.png) no-repeat 15px center; 
+	border: 1px solid #c1d779; 
+	color: #3C5A01; 
+}
+.nError { 
+	background: #fccac1 url(images/exclamation.png) no-repeat 15px center; 
+	border: 1px solid #e18b7c; 
+	color: #AC260F; 
+}
+.nInformation { 
+	background: #d1e4f3 url(images/information.png) no-repeat 15px center; 
+	border: 1px solid #99c4ea; 
+	color: #235685; 
+}
+.nLightbulb { 
+	background: #FEF0CB url(images/lightbulb.png) no-repeat 15px center; 
+	border: 1px solid #D3A350; 
+	color: #835F21; 
+}
+.nMessages { 
+	background: #9DDFFF url(images/email.png) no-repeat 15px center; 
+	border: 1px solid #42B4FF; 
+	color: #835F21; 
+}
+
