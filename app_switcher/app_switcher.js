@@ -70,7 +70,7 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
                 }
                 else {
                     appContainer.append('<div class="app ' + appName + '"></div>');
-                    $app = appContainer.find('.app');
+                    $app = appToLoad.opts && appToLoad.opts.el || appContainer.find('.app');
                     new appToLoad.app($app, $.extend(true, opts.appOpts, appToLoad.opts));
                     this.appCache[appName] = $app;
                 }
