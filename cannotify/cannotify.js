@@ -10,9 +10,13 @@ steal('can/control',
             message: 'Replace with your message...',
             state: 'info',
             hideable: true,
-            localize: true,
-            locales: 'tcoz/cannotify/locales',
-            localizizationLib: '//tcoz/lib/localization/localization.js'
+            css: {},
+            localization: {
+                localize: true,
+                locales: 'tcoz/cannotify/locales',
+                localizizationLib: '//tcoz/lib/localization/localization.js',
+                keyPrefix: 'cannotify.'
+            }
         }
     }, {
 
@@ -51,10 +55,11 @@ steal('can/control',
                         message: opts.message,
                         hideable: opts.hideable
                     }));
+                    self.element.find('.nNote').css(opts.css);
                 },
                 currentState = states[opts.state];
 
-            if(opts.localize) {
+            if(opts.localization.localize) {
                 this._localize(currentState, create);
             }
             else {
@@ -63,13 +68,15 @@ steal('can/control',
         },
 
         _createLocalized: function(stateObj, cb) {
-            stateObj.label = tcoz.localization.translate('cannotify.' + this.options.state, stateObj.label);
+            var opts = this.options;
+
+            stateObj.label = tcoz.localization.translate(opts.localization.keyPrefix + opts.state, stateObj.label);
             cb(stateObj);
         },
 
         _localize: function(stateObj, cb) {
             var self = this,
-                opts = this.options,
+                opts = this.options.localization,
                 localize = function() {
                     tcoz.localization.init().loadDictionary(steal.root.join(opts.locales).path, function() {
                         self._createLocalized(stateObj, cb);
@@ -89,11 +96,9 @@ steal('can/control',
         },
 
         ".hideit click": function(el, ev) {
-            var self = this;
-
-            this.element.fadeTo(200, 0.00, function() { //fade
-                $(this).slideUp(300, function() { //slide up
-                    $(this).remove(); //then remove from the DOM
+            $(el).fadeTo(200, 0.00, function() {
+                $(this).slideUp(100, function() {
+                    $(this).remove();
                 });
             });
         }
