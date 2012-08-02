@@ -1,4 +1,4 @@
-steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function($) {
+steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function() {
 
     window.TCOZ = window.TCOZ || {};
 
@@ -7,7 +7,9 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
             routeAttr: 'app',
             useAppSpace: true,
             apps: {},
-            appOpts: {}
+            appOpts: {},
+            noApp: false,
+            noAppId: 'noApp'
         }
     }, {
         init: function() {
@@ -50,6 +52,12 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
             }
         },
 
+        _isNoApp: function(appName) {
+            var opts = this.options;
+
+            return opts.noApp && appName === opts.noAppId;
+        },
+
         "{can.route} {routeAttr}": "loadApp",
 
         loadApp: function(data) {
@@ -58,9 +66,13 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
                 $app,
                 appName = data.app,
                 appToLoad = this._getAppToLoad(opts.apps[appName]),
-                appContainer = this.appContainer;
+                appContainer = this.appContainer,
+                isNoApp = this._isNoApp(appName);
 
-            if(appToLoad && this.currentAppName !== appName) {
+
+            console.log('LOAD APP: ' + appName);
+
+            if(appToLoad && this.currentAppName !== appName && (!isNoApp)) {
 
                 this._unloadAppByName();
 
@@ -80,12 +92,15 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
             }
             else {
                  if(!appToLoad) {
-                    console.log('No such app');
+                    if(!isNoApp) {
+                        console.log('No such app');
+                        this.element.trigger('noSuchAppEvent');
 
-                    this._unloadAppByName();
+                        this._unloadAppByName(this.currentAppName);
 
-                    this.currentApp = null;
-                    this.currentAppName = '';
+                        this.currentApp = null;
+                        this.currentAppName = '';
+                    }
                  }
                  else console.log('App already loaded');
             }
