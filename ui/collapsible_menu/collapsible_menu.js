@@ -1,4 +1,4 @@
-steal('can/control', function($) {
+steal('can/control', function() {
 
     window.TCOZ = window.TCOZ || {};
     window.TCOZ.UI = window.TCOZ.UI || {};
@@ -36,9 +36,7 @@ steal('can/control', function($) {
             }
         },
 
-        _toggle: function(el, ev) {
-            var target = $(ev.target);
-            
+        _doToggle: function(el, target) {
             if(target.closest('li').hasClass('collapsible')) {
                 var sub = el.find('ul.sub');
                 if(sub.length) {
@@ -46,6 +44,14 @@ steal('can/control', function($) {
                     sub.slideToggle();
                 }
             }
+        },
+
+        _toggle: function(el, ev) {
+            this._doToggle(el, $(ev.target));
+        },
+
+        " toggle": function(el, ev, target) {
+            this._doToggle(el, $(target));
         },
 
         destroy: function() {
