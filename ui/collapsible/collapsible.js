@@ -1,4 +1,4 @@
-steal('can/control', './collapsible.css', function($) {
+steal('can/control', './collapsible.css', function() {
 
     window.TCOZ = window.TCOZ || {};
     window.TCOZ.UI = window.TCOZ.UI || {};
