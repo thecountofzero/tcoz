@@ -13,6 +13,8 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
         }
     }, {
         init: function() {
+            var self = this;
+
             this.currentAppName = '';
 
             this.element.append('<div id="appContainer"></div>');
@@ -25,6 +27,15 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
             }
 
             this.appCache = {};
+
+            can.$(document).on('click', 'a', function(e) {
+
+                var href = $(this).attr("href");
+
+                if(location.hash === href) {
+                    self.loadApp(can.route.attr());
+                }
+            });
 
             this.loadApp(can.route.attr());
         },
@@ -70,13 +81,13 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
                 isNoApp = this._isNoApp(appName);
 
 
-            console.log('LOAD APP: ' + appName);
+            steal.dev.log('LOAD APP: ' + appName);
 
-            if(appToLoad && this.currentAppName !== appName && (!isNoApp)) {
+            if(appToLoad && /*this.currentAppName !== appName &&*/ (!isNoApp)) {
 
                 this._unloadAppByName();
 
-                if(opts.useAppSpace && (existingApp = this.appSpace.find('.'+appName)) && existingApp.length) {
+                if(opts.useAppSpace && (existingApp = this.appSpace.find('.' + appName)) && existingApp.length) {
                     
                     existingApp.trigger('resumed').appendTo(appContainer);
                 }
@@ -93,7 +104,7 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
             else {
                  if(!appToLoad) {
                     if(!isNoApp) {
-                        console.log('No such app');
+                        steal.dev.log('No such app');
                         this.element.trigger('noSuchAppEvent');
 
                         this._unloadAppByName(this.currentAppName);
@@ -102,7 +113,7 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
                         this.currentAppName = '';
                     }
                  }
-                 else console.log('App already loaded');
+                 else steal.dev.log('App already loaded');
             }
         }
     });
