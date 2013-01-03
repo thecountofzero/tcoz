@@ -5,17 +5,32 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
     window.TCOZ.AppSwitcher = can.Control({
         defaults: {
             routeAttr: 'app',
+            altRouteAttr: 'resource',
             useAppSpace: true,
             apps: {},
             appOpts: {},
-            noApp: false,
-            noAppId: 'noApp'
+            noApp: false, // Allow hash changes to not load an app
+            noAppId: 'noApp',
+            preLoadFunc: true,
+            applicationStr: 'Application',
+            forceLoad: false
         }
     }, {
         init: function() {
             var self = this;
 
             this.currentAppName = '';
+
+            this.loadedApp = null;
+
+            this.reloader = function(e) {
+
+                var href = can.$(this).attr("href");
+
+                if(location.hash === href/* || href.indexOf(can.route.attr('app')) !== -1*/) {
+                    self.loadApp(can.route.attr());
+                }
+            };
 
             this.element.append('<div id="appContainer"></div>');
             this.appContainer = this.element.find('#appContainer');
@@ -28,20 +43,14 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
 
             this.appCache = {};
 
-            can.$(document).on('click', 'a', function(e) {
-
-                var href = $(this).attr("href");
-
-                if(location.hash === href) {
-                    self.loadApp(can.route.attr());
-                }
-            });
+            // Allow an app to be reloaded when it's launching button is clicked
+            can.$(document).on('click', 'a', this.reloader);
 
             this.loadApp(can.route.attr());
         },
 
         _getAppToLoad: function(app) {
-            return ($.isFunction(app)) ? {
+            return (can.$.isFunction(app)) ? {
                 app: app,
                 opts: {},
                 useAppSpace: this.options.useAppSpace
@@ -71,17 +80,22 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
 
         "{can.route} {routeAttr}": "loadApp",
 
+        "{can.route} {altRouteAttr}": "loadApp",
+
         loadApp: function(data) {
-            var opts = this.options,
+            var self = this,
+                opts = this.options,
                 existingApp,
                 $app,
                 appName = data.app,
                 appToLoad = this._getAppToLoad(opts.apps[appName]),
                 appContainer = this.appContainer,
-                isNoApp = this._isNoApp(appName);
+                isNoApp = this._isNoApp(appName),
+                altData = can.route.attr(opts.altRouteAttr);
 
 
-            steal.dev.log('LOAD APP: ' + appName);
+            steal.dev.log('Loading Application: ' + appName);
+            steal.dev.log('Application Alternate Data: ' + altData);
 
             if(appToLoad && /*this.currentAppName !== appName &&*/ (!isNoApp)) {
 
@@ -94,7 +108,18 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
                 else {
                     appContainer.append('<div class="app ' + appName + '"></div>');
                     $app = appToLoad.opts && appToLoad.opts.el || appContainer.find('.app');
-                    new appToLoad.app($app, $.extend(true, opts.appOpts, appToLoad.opts));
+
+                    forceLoad = appToLoad.opts ? appToLoad.opts.forceLoad : false;
+
+                    if(can.$.isFunction(opts.preLoadFunc) && !forceLoad) {
+                        opts.preLoadFunc.call(self, function() {
+                            self.loadedApp = new appToLoad.app($app, can.extend(true, opts.appOpts, appToLoad.opts));
+                        }, appName, appToLoad.title ? appToLoad.title : self.options.applicationStr, altData);
+                    }
+                    else {
+                        this.loadedApp = new appToLoad.app($app, can.extend(true, opts.appOpts, appToLoad.opts));
+                    }
+
                     this.appCache[appName] = $app;
                 }
 
@@ -115,6 +140,15 @@ steal('can/control', 'can/view/ejs', 'can/route', 'can/control/route', function(
                  }
                  else steal.dev.log('App already loaded');
             }
+        },
+
+        getLoadedApp: function() {
+            return this.loadedApp;
+        },
+
+        destroy: function() {
+            can.$(document).off('click', 'a', this.reloader);
+            can.Control.prototype.destroy.call(this);
         }
     });
 });
